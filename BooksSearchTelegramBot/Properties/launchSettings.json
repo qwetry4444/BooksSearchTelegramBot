@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "BooksSearchTelegramBot": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "TELEGRAM_BOT_TOKEN": "7362807342:AAGTKC3qj3GMAnQH61oyqlEj4cRX3IiaWfM"
+      },
+      "hotReloadEnabled": true
+    }
+  }
+}
