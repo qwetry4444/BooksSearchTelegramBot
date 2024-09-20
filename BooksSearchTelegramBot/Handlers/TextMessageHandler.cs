@@ -1,5 +1,6 @@
 ﻿using BooksSearchTelegramBot.Keyboards;
 using BooksSearchTelegramBot.res;
+using BooksSearchTelegramBot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -8,7 +9,7 @@ using Telegram.Bot.Types.Enums;
 
 namespace BooksSearchTelegramBot.Handlers
 {
-    internal class TextMessageHandler(TelegramBotClient botClient, FSMContext context)
+    internal class TextMessageHandler(TelegramBotClient botClient, FSMContext context, OpenLibraryService openLibraryService)
     {
 
         public async Task OnMessage(Message msg, UpdateType type)
@@ -26,6 +27,11 @@ namespace BooksSearchTelegramBot.Handlers
                 case State.Search: 
                     HandleOnSearchState(msg);
                     break;
+
+                case State.SearchBookByTitle:
+                    HandleOnSearchBookByTitleState(msg);
+                    break;
+
             }
 
 
@@ -107,7 +113,7 @@ namespace BooksSearchTelegramBot.Handlers
                 case "📄 Название":
                     await botClient.SendTextMessageAsync(
                             chatId: msg.Chat,
-                            text: Strings.MyDefferedMessage,
+                            text: Strings.SearchByTitleMessage,
                             replyMarkup: Reply.SearchMenuReplyMarkup);
                     context.State = State.SearchBookByTitle;
                     break;
@@ -115,7 +121,7 @@ namespace BooksSearchTelegramBot.Handlers
                 case "💫 Жанр":
                     await botClient.SendTextMessageAsync(
                             chatId: msg.Chat,
-                            text: Strings.MyReadedMessage,
+                            text: Strings.SearchByGenreMessage,
                             replyMarkup: Inline.ChoiceGenreInlineMarkup);
                     context.State = State.SearchBookByGenre;
                     break;
@@ -123,7 +129,7 @@ namespace BooksSearchTelegramBot.Handlers
                 case "⭐ Рейтинг":
                     await botClient.SendTextMessageAsync(
                             chatId: msg.Chat,
-                            text: Strings.StartMenuMessage,
+                            text: Strings.SearchByRatingMessage,
                             replyMarkup: Reply.SearchMenuReplyMarkup);
                     break;
 
@@ -135,6 +141,34 @@ namespace BooksSearchTelegramBot.Handlers
                     context.State = State.Start;
                     break;
             }
+        }
+
+        public async void HandleOnSearchBookByTitleState(Message msg)
+        {
+            await botClient.SendTextMessageAsync(
+                            chatId: msg.Chat,
+                            text: "Ваша книга:",
+                            replyMarkup: Reply.SearchMenuReplyMarkup);
+            context.State = State.Search;
+            openLibraryService.SearchBookByTitle(msg.Text);
+        }
+
+        public async void HandleOnSearchBookByGenreState(Message msg)
+        {
+            await botClient.SendTextMessageAsync(
+                            chatId: msg.Chat,
+                            text: "Выберите жанр",
+                            replyMarkup: Inline.ChoiceGenreInlineMarkup);
+            context.State = State.Search;
+        }
+
+        public async void HandleOnSearchBookByRateState(Message msg)
+        {
+            await botClient.SendTextMessageAsync(
+                            chatId: msg.Chat,
+                            text: "Книги отсортированные по рейтингу",
+                            replyMarkup: Reply.SearchMenuReplyMarkup);
+            context.State = State.Search;
         }
     }
 }

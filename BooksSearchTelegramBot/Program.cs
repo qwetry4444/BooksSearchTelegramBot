@@ -1,5 +1,6 @@
 ﻿using BooksSearchTelegramBot;
 using BooksSearchTelegramBot.Handlers;
+using BooksSearchTelegramBot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -15,7 +16,9 @@ if (token != null)
     var me = await bot.GetMeAsync();
 
     var FSMContext = new FSMContext();
-    var messageHandler = new TextMessageHandler(bot, FSMContext);
+    var openLibraryService = new OpenLibraryService();
+
+    var messageHandler = new TextMessageHandler(bot, FSMContext, openLibraryService);
 
     bot.OnError += OnError;
     bot.OnMessage += messageHandler.OnMessage;
