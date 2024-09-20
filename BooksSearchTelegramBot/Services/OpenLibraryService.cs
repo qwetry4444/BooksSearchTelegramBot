@@ -12,29 +12,28 @@ namespace BooksSearchTelegramBot.Services
     {
         OpenLibraryClient client = new OpenLibraryClient();
 
-        async public Task<OLWorkData[]?>  SearchBookByTitle(string title)
+        async public Task<List<OLWork>>  SearchBookByTitle(string title)
         {
-            var parameters = new KeyValuePair<string, string>("limit", "10");
+            var worksCount = 6;
+            var works = new List<OLWork>();
+            var parameters = new KeyValuePair<string, string>("limit", worksCount.ToString());
 
-            OLWorkData[]? works = await client.Search.GetSearchResultsAsync(title, parameters);
+            OLWorkData[]? worksData = await client.Search.GetSearchResultsAsync(title, parameters);
 
-            if (works != null && works.Length > 0)
+            if (worksData != null && worksData.Length > 0)
             {
-                if (works.First() != null)
+                foreach (OLWorkData workData in worksData)
                 {
-                    await SearchBookById(works.First().ID);
+                    works.Add(await SearchBookById(workData.ID));
                 }
             }
             
             return works;
-            
         }
 
-        async public Task<OLWork> SearchBookById(string id)
+        async public Task<OLWork> SearchBookById(string bookId)
         {
-            var parameters = new KeyValuePair<string, string>("limit", "10");
-            
-            OLWork work = await client.GetWorkAsync(id, 10);
+            OLWork work = await client.GetWorkAsync(bookId);
             return work;
         }
 

@@ -1,4 +1,7 @@
-﻿using System;
+﻿using BooksSearchTelegramBot.res;
+using OpenLibraryNET;
+using OpenLibraryNET.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,6 +31,23 @@ namespace BooksSearchTelegramBot.Keyboards
             .AddButton("👽 Фэнтэзи", "👽 Фэнтэзи")
             .AddNewRow()
             .AddButton("🔎 Детектив", "🔎 Детектив")
-            .AddButton("🔎 Детективе", "🔎 Детективе");
+            .AddButton("📈 Саморазвитие", "📈 Саморазвитие");
+
+
+        public static InlineKeyboardMarkup CreateBookHeadsInlineKeyboard(List<OLWork> works)
+        {
+            InlineKeyboardMarkup BookHeadsInlineKeyboard = new InlineKeyboardMarkup();
+            if (works != null)
+            {
+                foreach (OLWork work in works)
+                {
+                    BookHeadsInlineKeyboard.AddButton(StringsGeneration.CreateBookHead(work), work.ID);
+                    BookHeadsInlineKeyboard.AddNewRow();
+                }
+            }
+            return BookHeadsInlineKeyboard; 
+        }
     }
+
+
 }

@@ -15,5 +15,21 @@ namespace BooksSearchTelegramBot
         SearchBookByGenre,
 
     }
+
+    enum CallbackDataType
+    {
+        GenreRoman,
+        GenreDrama,
+        GenreJourney,
+        GenreFantasy,
+        GenreDetective,
+        GenreSelfDevelopment,
+        AddBookToReaded,
+        AddBookToDeffered,
+        MoreAboutBook,
+        AuthorOfBook,
+        MoreAboutAuthor,
+        BoooksOfAuthor,
+    }
     
 }

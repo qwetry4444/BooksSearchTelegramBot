@@ -1,15 +1,15 @@
 ﻿using BooksSearchTelegramBot.Keyboards;
 using BooksSearchTelegramBot.res;
 using BooksSearchTelegramBot.Services;
+using OpenLibraryNET;
 using Telegram.Bot;
-using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 
 namespace BooksSearchTelegramBot.Handlers
 {
-    internal class TextMessageHandler(TelegramBotClient botClient, FSMContext context, OpenLibraryService openLibraryService)
+    class TextMessageHandler(TelegramBotClient botClient, FSMContext context, OpenLibraryService openLibraryService)
     {
 
         public async Task OnMessage(Message msg, UpdateType type)
@@ -71,7 +71,7 @@ namespace BooksSearchTelegramBot.Handlers
                 case "🔎 Поиск":
                     await botClient.SendTextMessageAsync(
                             chatId: msg.Chat,
-                            text: Strings.MyMenuMessage,
+                            text: Strings.SearchMenuMessage,
                             replyMarkup: Reply.SearchMenuReplyMarkup);
                     context.State = State.Search;
                     break;
@@ -145,12 +145,13 @@ namespace BooksSearchTelegramBot.Handlers
 
         public async void HandleOnSearchBookByTitleState(Message msg)
         {
+            List<OLWork> works = await openLibraryService.SearchBookByTitle(msg.Text);
+
             await botClient.SendTextMessageAsync(
                             chatId: msg.Chat,
-                            text: "Ваша книга:",
-                            replyMarkup: Reply.SearchMenuReplyMarkup);
+                            text: Strings.SelectMoreApproriate,
+                            replyMarkup: Inline.CreateBookHeadsInlineKeyboard(works));
             context.State = State.Search;
-            openLibraryService.SearchBookByTitle(msg.Text);
         }
 
         public async void HandleOnSearchBookByGenreState(Message msg)

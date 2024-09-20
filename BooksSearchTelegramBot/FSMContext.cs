@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BooksSearchTelegramBot
 {
-    internal class FSMContext
+    class FSMContext
     {
         public FSMContext() { State = State.Start; }
 
