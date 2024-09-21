@@ -13,7 +13,6 @@ namespace BooksSearchTelegramBot
         Search,
         SearchBookByTitle,
         SearchBookByGenre,
-
     }
 
     enum CallbackDataType
@@ -24,10 +23,12 @@ namespace BooksSearchTelegramBot
         GenreFantasy,
         GenreDetective,
         GenreSelfDevelopment,
-        AddBookToReaded,
-        AddBookToDeffered,
+
         MoreAboutBook,
         AuthorOfBook,
+        AddBookToReaded,
+        AddBookToDeffered,
+
         MoreAboutAuthor,
         BoooksOfAuthor,
     }

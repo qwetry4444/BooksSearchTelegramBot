@@ -1,57 +1,76 @@
 ﻿using BooksSearchTelegramBot.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Telegram.Bot;
-using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types;
-using BooksSearchTelegramBot.Keyboards;
+using OpenLibraryNET;
+using BooksSearchTelegramBot.res;
 
 namespace BooksSearchTelegramBot.Handlers
 {
     class InlineQueryHandler(TelegramBotClient botClient, FSMContext context, OpenLibraryService openLibraryService)
     {
-        public async Task OnInlineQuery(CallbackQuery query, UpdateType type)
-        {
-            if (int.TryParse(query.Data, out int callbackTypeId))
-            {
-                CallbackDataType callbackType = (CallbackDataType)callbackTypeId;
-                switch (callbackType)
-                {
-                    case CallbackDataType.GenreJourney:
-                        await botClient.SendTextMessageAsync(
-                            chatId: query.From.Id,
-                            text: $"Книги в жанре {query.InlineMessageId}");
-                        break;
-                    case CallbackDataType.GenreDetective:
-                        await botClient.SendTextMessageAsync(
-                            chatId: query.From.Id,
-                            text: $"Книги в жанре {query.InlineMessageId}");
-                        break;
-                    case CallbackDataType.GenreSelfDevelopment:
-                        await botClient.SendTextMessageAsync(
-                            chatId: query.From.Id,
-                            text: $"Книги в жанре {query.InlineMessageId}");
-                        break;
-                    case CallbackDataType.GenreFantasy:
-                        await botClient.SendTextMessageAsync(
-                            chatId: query.From.Id,
-                            text: $"Книги в жанре {query.InlineMessageId}");
-                        break;
-                    case CallbackDataType.GenreDrama:
-                        await botClient.SendTextMessageAsync(
-                            chatId: query.From.Id,
-                            text: $"Книги в жанре {query.InlineMessageId}");
-                        break;
-                    case CallbackDataType.GenreRoman:
-                        await botClient.SendTextMessageAsync(
-                            chatId: query.From.Id,
-                            text: $"Книги в жанре {query.InlineMessageId}");
-                        break;
+        OLWork work;
+        OLAuthor author;
 
-                    case CallbackDataType.
+
+        public async Task OnInlineQuery(Update update)
+        {
+            if (update is { CallbackQuery: { } query })
+            {
+                if (int.TryParse(query.Data, out int callbackTypeId))
+                {
+                    CallbackDataType callbackType = (CallbackDataType)callbackTypeId;
+                    switch (callbackType)
+                    {
+                        case CallbackDataType.GenreJourney:
+                            await botClient.SendTextMessageAsync(
+                                chatId: query.From.Id,
+                                text: $"Книги в жанре {query.InlineMessageId}");
+                            break;
+                        case CallbackDataType.GenreDetective:
+                            await botClient.SendTextMessageAsync(
+                                chatId: query.From.Id,
+                                text: $"Книги в жанре {query.InlineMessageId}");
+                            break;
+                        case CallbackDataType.GenreSelfDevelopment:
+                            await botClient.SendTextMessageAsync(
+                                chatId: query.From.Id,
+                                text: $"Книги в жанре {query.InlineMessageId}");
+                            break;
+                        case CallbackDataType.GenreFantasy:
+                            await botClient.SendTextMessageAsync(
+                                chatId: query.From.Id,
+                                text: $"Книги в жанре {query.InlineMessageId}");
+                            break;
+                        case CallbackDataType.GenreDrama:
+                            await botClient.SendTextMessageAsync(
+                                chatId: query.From.Id,
+                                text: $"Книги в жанре {query.InlineMessageId}");
+                            break;
+                        case CallbackDataType.GenreRoman:
+                            await botClient.SendTextMessageAsync(
+                                chatId: query.From.Id,
+                                text: $"Книги в жанре {query.InlineMessageId}");
+                            break;
+
+                        default:
+                            work = await openLibraryService.SearchBookById(query.Data.ToString());
+                            if (work != null )
+                            {
+                                if (work.Data != null)
+                                {
+                                    if (work.Data.AuthorKeys != null && work.Data.AuthorKeys.Count > 0)
+                                    {
+                                        author = await openLibraryService.SearchAuthorById(work.Data.AuthorKeys.First());
+                                    }
+                                }
+                            }
+                            await botClient.SendTextMessageAsync(
+                                chatId: query.From.Id,
+                                text: StringsGeneration.CreateAboutBookMessage(work, author),
+                                );
+
+                            break;
+                    }
                 }
             }
         }
