@@ -19,9 +19,26 @@ namespace BooksSearchTelegramBot.Keyboards
             .AddButton("✅ Прочитано", "✅ Прочитано")
             .AddButton("📚 Отложить", "📚 Отложить");
 
-        public static InlineKeyboardMarkup AuthorMenuInlineMarkup = new InlineKeyboardMarkup()
-            .AddButton("💬 Подробнее", "💬 Подробнее")
-            .AddButton("📚 Книги автора", "📚 Книги автора");
+        public static InlineKeyboardMarkup CreateBookMenuInlineMarkup(OLWork work)
+        {
+            if (work.Data != null)
+            {
+                return new InlineKeyboardMarkup()
+                    .AddButton("💬 Подробнее", $"💬 Подробнее|{work.ID}")
+                    .AddButton("👴 Автор", $"👴 Автор|{work.Data.AuthorKeys.FirstOrDefault()}")
+                    .AddNewRow()
+                    .AddButton("✅ Прочитано", $"✅ Прочитано|{work.ID}")
+                    .AddButton("📚 Отложить", $"📚 Отложить|{work.ID}");
+            }
+            return BookMenuInlineMarkup;
+        }
+
+        public static InlineKeyboardMarkup CreateAuthorMenuInlineMarkup(OLAuthor author)
+        {
+            return new InlineKeyboardMarkup()
+                .AddButton("💬 Подробнее", $"💬 Подробнее")
+                .AddButton("📚 Книги автора", $"📚 Книги автора|{author.ID}");
+        }
 
         public static InlineKeyboardMarkup ChoiceGenreInlineMarkup = new InlineKeyboardMarkup()
             .AddButton("💕 Роман", "💕 Роман") 
@@ -41,7 +58,7 @@ namespace BooksSearchTelegramBot.Keyboards
             {
                 foreach (OLWork work in works)
                 {
-                    BookHeadsInlineKeyboard.AddButton(StringsGeneration.CreateBookHead(work), work.ID);
+                    BookHeadsInlineKeyboard.AddButton(StringsGeneration.CreateBookHead(work), $"work|{work.ID}");
                     BookHeadsInlineKeyboard.AddNewRow();
                 }
             }

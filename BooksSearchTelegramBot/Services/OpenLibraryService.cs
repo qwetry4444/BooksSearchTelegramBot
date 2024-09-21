@@ -48,18 +48,20 @@ namespace BooksSearchTelegramBot.Services
             byte[]? cover = null;
             if (work.Data != null)
             {
-                cover = await client.Image.GetCoverAsync("olid", work.Data.CoverIDs.First().ToString(), "L");
+                if (work.Data.CoverIDs != null && work.Data.CoverIDs.Count > 0)
+                {
+                    cover = await client.Image.GetCoverAsync("id", work.Data.CoverIDs.First().ToString(), "L");
+                }
             }
-
             return cover;
         }
 
-        async public Task<byte[]?> GetBookCover(OLAuthor author)
+        async public Task<byte[]?> GetAuthorPhoto(OLAuthor author)
         {
             byte[]? authorPhoto = null;
             if (author.Data != null)
             {
-                authorPhoto = await client.Image.GetCoverAsync("olid", author.Data.PhotosIDs.First().ToString(), "L");
+                authorPhoto = await client.Image.GetCoverAsync("id", author.Data.PhotosIDs.First().ToString(), "L");
             }
 
             return authorPhoto;
