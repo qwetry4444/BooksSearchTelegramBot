@@ -81,8 +81,16 @@ namespace BooksSearchTelegramBot.res
                     if (work.Data.Description != null && work.Data.Description != String.Empty)
                     {
                         // Если в описании книги меньше 800 символов, то добавляем его в message иначе, берем первые 800 обрезанные по последней точке.
-                        message += "<b>Описание</b>: ";
-                        message += work.Data.Description.Length < 800 ? work.Data.Description : string.Join(".", work.Data.Description[..800].Split('.')[1 .. -1]);
+                        var sentences = work.Data.Description.Split('.');
+                        var shortenedDescription = string.Join(".", sentences[..^1]) + "."; // Восстанавливаем предложения до 800 символов
+
+                        // Проверяем, не превышает ли длина итогового текста 800 символов
+                        if (shortenedDescription.Length > 800)
+                        {
+                            shortenedDescription = shortenedDescription[..800];
+                        }
+
+                        message += shortenedDescription;
                         message += "\n\n";
                     }
                     if (work.Bookshelves != null)
@@ -119,8 +127,22 @@ namespace BooksSearchTelegramBot.res
                     if (author.Data.Bio != null)
                     {
                         message += "<b>Биография</b>: ";
-                        message += author.Data.Bio.Length < 800 ? author.Data.Bio : string.Join(".", author.Data.Bio[..800].Split('.')[1..-1]);
-                        message += ".\n";
+                        if (author.Data.Bio.Length < 800)
+                        {
+                            message += author.Data.Bio;
+                        }
+                        else
+                        {
+                            var sentences = author.Data.Bio.Split('.');
+                            var shortenedBio = string.Join(".", sentences[..^1]); 
+
+                            if (shortenedBio.Length > 800)
+                            {
+                                shortenedBio = shortenedBio[..800]; 
+                            }
+
+                            message += shortenedBio + ".\n\n"; 
+                        }
                     }
                 }
             }

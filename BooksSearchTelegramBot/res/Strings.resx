@@ -144,6 +144,9 @@
   <data name="MyReadedMessage" xml:space="preserve">
     <value>Прочитанные вами книги:</value>
   </data>
+  <data name="PleaseUseKeyboards" xml:space="preserve">
+    <value>Пожалуйста, для взаимодействия с ботом используйте клавиатуры.</value>
+  </data>
   <data name="SearchByGenreButton" xml:space="preserve">
     <value>💫 Жанр</value>
   </data>
@@ -173,6 +176,12 @@
   </data>
   <data name="StartMenuMessage" xml:space="preserve">
     <value>Поиск или ваши книги?</value>
+  </data>
+  <data name="UserDontHaveDeferredBooks" xml:space="preserve">
+    <value>У вас нет отложенных книг</value>
+  </data>
+  <data name="UserDontHaveReadedBooks" xml:space="preserve">
+    <value>У вас нет прочитанных книг</value>
   </data>
   <data name="WelcomeMessageWithoutUsername" xml:space="preserve">
     <value>Здравствуйте, это бот для поиска книг</value>

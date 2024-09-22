@@ -9,11 +9,8 @@ using System.IO;
 
 namespace BooksSearchTelegramBot.Handlers
 {
-    class InlineQueryHandler(TelegramBotClient botClient, FSMContext context, OpenLibraryService openLibraryService)
+    class InlineQueryHandler(TelegramBotClient botClient, FSMContext context, OpenLibraryService openLibraryService, DbService dbService)
     {
-
-
-
         public async Task OnInlineQuery(Update update)
         {
             if (update is { CallbackQuery: { } query })
@@ -39,52 +36,18 @@ namespace BooksSearchTelegramBot.Handlers
                                 break;
 
                             case "✅ Прочитано":
+                                await onReadedBook(query, dataParts[1]);
                                 break;
 
                             case "📚 Отложить":
+                                await onDeferredBook(query, dataParts[1]);
                                 break;
-                        }
-                    }
-                    else
-                    {
-                        switch (dataParts[0])
-                        {
-                            //case CallbackDataType.GenreJourney:
-                            //    await botClient.SendTextMessageAsync(
-                            //        chatId: query.From.Id,
-                            //        text: $"Книги в жанре {query.InlineMessageId}");
-                            //    break;
-                            //case CallbackDataType.GenreDetective:
-                            //    await botClient.SendTextMessageAsync(
-                            //        chatId: query.From.Id,
-                            //        text: $"Книги в жанре {query.InlineMessageId}");
-                            //    break;
-                            //case CallbackDataType.GenreSelfDevelopment:
-                            //    await botClient.SendTextMessageAsync(
-                            //        chatId: query.From.Id,
-                            //        text: $"Книги в жанре {query.InlineMessageId}");
-                            //    break;
-                            //case CallbackDataType.GenreFantasy:
-                            //    await botClient.SendTextMessageAsync(
-                            //        chatId: query.From.Id,
-                            //        text: $"Книги в жанре {query.InlineMessageId}");
-                            //    break;
-                            //case CallbackDataType.GenreDrama:
-                            //    await botClient.SendTextMessageAsync(
-                            //        chatId: query.From.Id,
-                            //        text: $"Книги в жанре {query.InlineMessageId}");
-                            //    break;
-                            //case CallbackDataType.GenreRoman:
-                            //    await botClient.SendTextMessageAsync(
-                            //        chatId: query.From.Id,
-                            //        text: $"Книги в жанре {query.InlineMessageId}");
-                            //    break;
                         }
                     }
                 }
             }
         }
-        
+
         public async Task onBookSearch(CallbackQuery query, string workId)
         {
             OLWork work = await openLibraryService.SearchBookById(workId);
@@ -139,22 +102,50 @@ namespace BooksSearchTelegramBot.Handlers
 
         public async Task onGetBookAuthor(CallbackQuery query, string athorId)
         {
-            OLWork work = await openLibraryService.SearchBookById(workId);
-            if (work != null)
-            {
-                if (work.Data != null)
-                {
-                    if (work.Data.AuthorKeys != null && work.Data.AuthorKeys.Count > 0)
-                    {
-                        OLAuthor author = await openLibraryService.SearchAuthorById(work.Data.AuthorKeys.FirstOrDefault());
-                        if (author != null)
-                        {
+            OLAuthor author = await openLibraryService.SearchAuthorById(athorId);
+            byte[]? authorPhoto = await openLibraryService.GetAuthorPhoto(author);
 
-                        }
-                    }
+            if (author != null)
+            {
+                String message = StringsGeneration.CreateAboutAuthorMessage(author);
+                if (authorPhoto != null)
+                {
+                    using (var stream = new MemoryStream(authorPhoto))
+                        await botClient.SendPhotoAsync(
+                                        chatId: query.From.Id,
+                                        photo: stream,
+                                        caption: message,
+                                        replyMarkup: Inline.CreateAuthorMenuInlineMarkup(author),
+                                        parseMode: ParseMode.Html);
+                } else
+                {
+                    await botClient.SendTextMessageAsync(
+                                        chatId: query.From.Id,
+                                        text: message,
+                                        replyMarkup: Inline.CreateAuthorMenuInlineMarkup(author),
+                                        parseMode: ParseMode.Html);
                 }
             }
+        }
 
+        public async Task onReadedBook(CallbackQuery query, string bookId)
+        {
+            dbService.AddUserReadedBook(query.From.Id, bookId);
+            await botClient.SendTextMessageAsync(
+                    chatId: query.From.Id,
+                    text: Strings.AddToReadedMessage,
+                    replyMarkup: Reply.SearchMenuReplyMarkup,
+                    parseMode: ParseMode.Html);
+        }
+
+        public async Task onDeferredBook(CallbackQuery query, string bookId)
+        {
+            dbService.AddUserReadedBook(query.From.Id, bookId);
+            await botClient.SendTextMessageAsync(
+                    chatId: query.From.Id,
+                    text: Strings.AddToDefferedMessage,
+                    replyMarkup: Reply.SearchMenuReplyMarkup,
+                    parseMode: ParseMode.Html);
         }
     }
 }

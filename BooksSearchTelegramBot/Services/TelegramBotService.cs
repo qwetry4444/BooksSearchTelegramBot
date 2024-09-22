@@ -1,4 +1,6 @@
-﻿using BooksSearchTelegramBot.Handlers;
+﻿using BooksSearchTelegramBot.Database;
+using BooksSearchTelegramBot.Database.Repositories;
+using BooksSearchTelegramBot.Handlers;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 
@@ -8,20 +10,33 @@ namespace BooksSearchTelegramBot.Services
     {
         private readonly TelegramBotClient bot;
         private readonly CancellationTokenSource cts;
-        private readonly FSMContext fSMContext;
+
         private readonly OpenLibraryService openLibraryService;
+
+        private readonly ApplicationDbContext applicationDbContext;
+        private readonly UserReadedBookRepository userReadedBookRepository;
+        private readonly UserDeferredBookRepository userDeferredBookRepository;
+        private readonly DbService dbService;
+
+        private readonly FSMContext fSMContext;
         private readonly TextMessageHandler textMessageHandler;
-        private readonly InlineQueryHandler inlineQueryHandler;
-        
+        private readonly InlineQueryHandler inlineQueryHandler; 
+
         public TelegramBotService(string token)
-        {
-            fSMContext = new FSMContext();
+        { 
             cts = new CancellationTokenSource();
             bot = new TelegramBotClient(token, cancellationToken: cts.Token);
-            openLibraryService = new OpenLibraryService();
-            textMessageHandler = new TextMessageHandler(bot, fSMContext, openLibraryService);
-            inlineQueryHandler = new InlineQueryHandler(bot, fSMContext, openLibraryService);
 
+            openLibraryService = new OpenLibraryService();
+
+            applicationDbContext = new ApplicationDbContext();
+            userReadedBookRepository = new UserReadedBookRepository(applicationDbContext);
+            userDeferredBookRepository = new UserDeferredBookRepository(applicationDbContext);
+            dbService = new DbService(userReadedBookRepository, userDeferredBookRepository);
+
+            fSMContext = new FSMContext();
+            textMessageHandler = new TextMessageHandler(bot, fSMContext, openLibraryService, dbService);
+            inlineQueryHandler = new InlineQueryHandler(bot, fSMContext, openLibraryService, dbService);   
         }
 
         public async Task StartBotAsync()

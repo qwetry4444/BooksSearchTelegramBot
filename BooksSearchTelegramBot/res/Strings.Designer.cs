@@ -142,6 +142,15 @@ namespace BooksSearchTelegramBot.res {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Пожалуйста, для взаимодействия с ботом используйте клавиатуры..
+        /// </summary>
+        internal static string PleaseUseKeyboards {
+            get {
+                return ResourceManager.GetString("PleaseUseKeyboards", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на 💫 Жанр.
         /// </summary>
         internal static string SearchByGenreButton {
@@ -228,6 +237,24 @@ namespace BooksSearchTelegramBot.res {
         internal static string StartMenuMessage {
             get {
                 return ResourceManager.GetString("StartMenuMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на У вас нет отложенных книг.
+        /// </summary>
+        internal static string UserDontHaveDeferredBooks {
+            get {
+                return ResourceManager.GetString("UserDontHaveDeferredBooks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на У вас нет прочитанных книг.
+        /// </summary>
+        internal static string UserDontHaveReadedBooks {
+            get {
+                return ResourceManager.GetString("UserDontHaveReadedBooks", resourceCulture);
             }
         }
         

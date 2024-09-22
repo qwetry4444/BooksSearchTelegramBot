@@ -21,7 +21,8 @@ namespace BooksSearchTelegramBot.Keyboards
         public static IReplyMarkup SearchMenuReplyMarkup = new ReplyKeyboardMarkup(true)
             .AddButton(Strings.SearchByTitleButton)
             .AddNewRow(Strings.SearchByRatingButton)
-            .AddNewRow(Strings.SearchByGenreButton);
+            .AddNewRow(Strings.SearchByGenreButton)
+            .AddNewRow(Strings.BackButton);
         
             
     }

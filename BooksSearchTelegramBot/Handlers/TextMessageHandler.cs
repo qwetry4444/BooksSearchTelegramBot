@@ -1,4 +1,5 @@
-﻿using BooksSearchTelegramBot.Keyboards;
+﻿using BooksSearchTelegramBot.Database.Models;
+using BooksSearchTelegramBot.Keyboards;
 using BooksSearchTelegramBot.res;
 using BooksSearchTelegramBot.Services;
 using OpenLibraryNET;
@@ -9,9 +10,8 @@ using Telegram.Bot.Types.Enums;
 
 namespace BooksSearchTelegramBot.Handlers
 {
-    class TextMessageHandler(TelegramBotClient botClient, FSMContext context, OpenLibraryService openLibraryService)
+    class TextMessageHandler(TelegramBotClient botClient, FSMContext context, OpenLibraryService openLibraryService, DbService dbService)
     {
-
         public async Task OnMessage(Message msg, UpdateType type)
         {
             switch (context.State)
@@ -31,10 +31,7 @@ namespace BooksSearchTelegramBot.Handlers
                 case State.SearchBookByTitle:
                     HandleOnSearchBookByTitleState(msg);
                     break;
-
             }
-
-
         }
 
         public async void HandleOnStartState(Message msg)
@@ -75,6 +72,13 @@ namespace BooksSearchTelegramBot.Handlers
                             replyMarkup: Reply.SearchMenuReplyMarkup);
                     context.State = State.Search;
                     break;
+
+                default:
+                    await botClient.SendTextMessageAsync(
+                            chatId: msg.Chat,
+                            text: Strings.PleaseUseKeyboards,
+                            replyMarkup: Reply.SearchMenuReplyMarkup);
+                    break;
             }
         }
 
@@ -83,17 +87,37 @@ namespace BooksSearchTelegramBot.Handlers
             switch (msg.Text)
             {
                 case "📚 Отложенные":
-                    await botClient.SendTextMessageAsync(
+                    List<UserDeferredBook> userDeferredBooks = await dbService.GetUserDeferredBooks(msg.From.Id);
+                    if (userDeferredBooks != null && userDeferredBooks.Count > 0)
+                    {
+                        await botClient.SendTextMessageAsync(
                             chatId: msg.Chat,
                             text: Strings.MyDefferedMessage,
-                            replyMarkup: Reply.MyMenuReplyMarkup);
+                            replyMarkup: Inline.CreateBookHeadsInlineKeyboard(await openLibraryService.GetListOfWorkByListOfUserDeferredBook(userDeferredBooks)));
+                    }
+                    else
+                    {
+                        await botClient.SendTextMessageAsync(
+                            chatId: msg.Chat,
+                            text: Strings.UserDontHaveDeferredBooks);
+                    }
                     break;
 
                 case "✅ Прочитанные":
-                    await botClient.SendTextMessageAsync(
+                    List<UserReadedBook> userReadedBooks = await dbService.GetUserReadedBooks(msg.From.Id);
+                    if (userReadedBooks != null && userReadedBooks.Count > 0)
+                    {
+                        await botClient.SendTextMessageAsync(
                             chatId: msg.Chat,
                             text: Strings.MyReadedMessage,
-                            replyMarkup: Reply.MyMenuReplyMarkup);
+                            replyMarkup: Inline.CreateBookHeadsInlineKeyboard(await openLibraryService.GetListOfWorkByListOfUserReadedBook(userReadedBooks)));
+                    }
+                    else
+                    {
+                        await botClient.SendTextMessageAsync(
+                            chatId: msg.Chat,
+                            text: Strings.UserDontHaveReadedBooks);
+                    }
                     break;
 
                 case "⬅ Назад":
@@ -102,6 +126,13 @@ namespace BooksSearchTelegramBot.Handlers
                             text: Strings.StartMenuMessage,
                             replyMarkup: Reply.StartMenuReplyMarkup);
                     context.State = State.Start;
+                    break;
+
+                default:
+                    await botClient.SendTextMessageAsync(
+                            chatId: msg.Chat,
+                            text: Strings.PleaseUseKeyboards,
+                            replyMarkup: Reply.MyMenuReplyMarkup);
                     break;
             }
         }
@@ -123,7 +154,6 @@ namespace BooksSearchTelegramBot.Handlers
                             chatId: msg.Chat,
                             text: Strings.SearchByGenreMessage,
                             replyMarkup: Inline.ChoiceGenreInlineMarkup);
-                    context.State = State.SearchBookByGenre;
                     break;
 
                 case "⭐ Рейтинг":
@@ -139,6 +169,13 @@ namespace BooksSearchTelegramBot.Handlers
                             text: Strings.StartMenuMessage,
                             replyMarkup: Reply.StartMenuReplyMarkup);
                     context.State = State.Start;
+                    break;
+
+                default:
+                    await botClient.SendTextMessageAsync(
+                            chatId: msg.Chat,
+                            text: Strings.PleaseUseKeyboards,
+                            replyMarkup: Reply.SearchMenuReplyMarkup);
                     break;
             }
         }
