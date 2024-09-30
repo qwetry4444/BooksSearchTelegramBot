@@ -1,11 +1,6 @@
 ﻿using BooksSearchTelegramBot.Database.Models;
 using OpenLibraryNET;
 using OpenLibraryNET.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BooksSearchTelegramBot.Services
 {
@@ -13,7 +8,7 @@ namespace BooksSearchTelegramBot.Services
     {
         OpenLibraryClient client = new OpenLibraryClient();
 
-        async public Task<List<OLWork>> SearchBookByTitle(string title)
+        async public Task<List<OLWork>?> SearchBookByTitle(string title)
         {
             var worksCount = 6;
             var works = new List<OLWork>();
@@ -25,23 +20,50 @@ namespace BooksSearchTelegramBot.Services
             {
                 foreach (OLWorkData workData in worksData)
                 {
-                    works.Add(await SearchBookById(workData.ID));
+                    try
+                    {
+                        var work = await SearchBookById(workData.ID);
+                        if (work != null)
+                        {
+                            works.Add(work);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        return null;
+                    }
+
                 }
             }
 
             return works;
         }
 
-        async public Task<OLWork> SearchBookById(string bookId)
+        async public Task<OLWork?> SearchBookById(string bookId)
         {
-            OLWork work = await client.GetWorkAsync(bookId);
-            return work;
+            try
+            {
+                OLWork work = await client.GetWorkAsync(bookId);
+                return work;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
         }
 
-        async public Task<OLAuthor> SearchAuthorById(string authorId)
+        async public Task<OLAuthor?> SearchAuthorById(string authorId)
         {
-            OLAuthor authorData = await client.GetAuthorAsync(authorId);
-            return authorData;
+            try
+            {
+                OLAuthor authorData = await client.GetAuthorAsync(authorId);
+                return authorData;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         async public Task<byte[]?> GetBookCover(OLWork work)
@@ -57,7 +79,7 @@ namespace BooksSearchTelegramBot.Services
                     }
                     return cover;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     return null;
                 }
@@ -74,7 +96,8 @@ namespace BooksSearchTelegramBot.Services
                 {
                     authorPhoto = await client.Image.GetAuthorPhotoAsync("id", author.Data.PhotosIDs.First().ToString(), "L");
                     return authorPhoto;
-                } catch (Exception ex)
+                }
+                catch (Exception)
                 {
                     return null;
                 }
@@ -82,27 +105,33 @@ namespace BooksSearchTelegramBot.Services
             return null;
         }
 
-        async public Task<List<OLWork>> GetListOfWorkByListOfUserReadedBook(List<UserReadedBook> userReadedBooks) 
-        { 
-            //List<OLWork> works = [];
-            //foreach (UserReadedBook userReadedBook in userDeferredBooks)
-            //{
-            //    works.Add(await SearchBookById(userReadedBook.BookId));
-            //}
-            //return works;
+        async public Task<List<OLWork>?> GetListOfWorkByListOfUserReadedBook(List<UserReadedBook> userReadedBooks)
+        {
+            try
+            {
+                var tasks = userReadedBooks.Select(userReadedBook => SearchBookById(userReadedBook.BookId));
+                var works = await Task.WhenAll(tasks);
+                return works.ToList();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
 
-            var tasks = userReadedBooks.Select(userReadedBook => SearchBookById(userReadedBook.BookId));
-            var works = await Task.WhenAll(tasks);
-            return works.ToList();
         }
 
         async public Task<List<OLWork>> GetListOfWorkByListOfUserDeferredBook(List<UserDeferredBook> userDeferredBooks)
         {
-            var tasks = userDeferredBooks.Select(userDeferredBooks => SearchBookById(userDeferredBooks.BookId));
-            var works = await Task.WhenAll(tasks);
-            return works.ToList();
+            try
+            {
+                var tasks = userDeferredBooks.Select(userDeferredBooks => SearchBookById(userDeferredBooks.BookId));
+                var works = await Task.WhenAll(tasks);
+                return works.ToList();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
-
-
     }
 }

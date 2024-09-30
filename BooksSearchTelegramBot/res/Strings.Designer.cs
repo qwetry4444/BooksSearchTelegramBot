@@ -88,6 +88,51 @@ namespace BooksSearchTelegramBot.res {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Не удалось найти автора.
+        /// </summary>
+        internal static string CouldNotFindAuthor {
+            get {
+                return ResourceManager.GetString("CouldNotFindAuthor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Не удалось найти книгу.
+        /// </summary>
+        internal static string CouldNotFindBook {
+            get {
+                return ResourceManager.GetString("CouldNotFindBook", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Не удалось найти ваши отложенные книги.
+        /// </summary>
+        internal static string CouldNotFindDeferredBooks {
+            get {
+                return ResourceManager.GetString("CouldNotFindDeferredBooks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Не удалось дополнительную информацию.
+        /// </summary>
+        internal static string CouldNotFindInformation {
+            get {
+                return ResourceManager.GetString("CouldNotFindInformation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Не удалось найти ваши прочитанные книги.
+        /// </summary>
+        internal static string CouldNotFindReadedBooks {
+            get {
+                return ResourceManager.GetString("CouldNotFindReadedBooks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на 📚 Отложенные.
         /// </summary>
         internal static string MyDefferedButton {

@@ -126,6 +126,21 @@
   <data name="BackButton" xml:space="preserve">
     <value>⬅ Назад</value>
   </data>
+  <data name="CouldNotFindAuthor" xml:space="preserve">
+    <value>Не удалось найти автора</value>
+  </data>
+  <data name="CouldNotFindBook" xml:space="preserve">
+    <value>Не удалось найти книгу</value>
+  </data>
+  <data name="CouldNotFindDeferredBooks" xml:space="preserve">
+    <value>Не удалось найти ваши отложенные книги</value>
+  </data>
+  <data name="CouldNotFindInformation" xml:space="preserve">
+    <value>Не удалось дополнительную информацию</value>
+  </data>
+  <data name="CouldNotFindReadedBooks" xml:space="preserve">
+    <value>Не удалось найти ваши прочитанные книги</value>
+  </data>
   <data name="MyDefferedButton" xml:space="preserve">
     <value>📚 Отложенные</value>
   </data>

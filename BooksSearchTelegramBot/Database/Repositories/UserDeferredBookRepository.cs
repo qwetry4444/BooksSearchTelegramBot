@@ -14,7 +14,7 @@ namespace BooksSearchTelegramBot.Database.Repositories
 
         public async Task<UserDeferredBook?> GetByUserAndBookIdAsync(long userId, string bookId)
         {
-            return await _dbContext.UserDeferredBook.FindAsync(userId,  bookId);
+            return await _dbContext.UserDeferredBook.FindAsync(userId, bookId);
         }
 
         public async Task<List<UserDeferredBook>> GetAllUserDeferredBooksAsync(long userId)

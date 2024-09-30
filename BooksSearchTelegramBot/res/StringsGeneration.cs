@@ -8,7 +8,7 @@ namespace BooksSearchTelegramBot.res
         {
             return $"Здравствуйте {userName}, это бот для поиска книг";
         }
-        
+
         public static String CreateAboutBookMessage(OLWork work, OLAuthor author)
         {
             String aboutBookString = String.Empty;
@@ -18,7 +18,7 @@ namespace BooksSearchTelegramBot.res
                 {
                     if (work.Data.Title != null)
                     {
-                        aboutBookString += $"<b>{work.Data.Title}</b>\n\n" ;
+                        aboutBookString += $"<b>{work.Data.Title}</b>\n\n";
                     }
                     if (author != null)
                     {
@@ -54,7 +54,7 @@ namespace BooksSearchTelegramBot.res
                         aboutBookString += "\n\n";
 
                     }
-                    
+
                     if (work.Ratings != null)
                     {
                         if (work.Ratings.Average != null)
@@ -72,7 +72,7 @@ namespace BooksSearchTelegramBot.res
             String message = String.Empty;
             if (work != null)
             {
-                if (work.Data  != null)
+                if (work.Data != null)
                 {
                     if (work.Data.Title != null)
                     {
@@ -99,7 +99,7 @@ namespace BooksSearchTelegramBot.res
                         message += $"<b>Сейчас читают</b> {work.Bookshelves.CurrentlyReading} человек\n";
                         message += $"<b>Хотят прочитать</b> {work.Bookshelves.WantToRead} человек\n";
                     }
-                    if (work.Editions != null &&  work.Editions.Count > 0) 
+                    if (work.Editions != null && work.Editions.Count > 0)
                     {
                         message += $"<b>Издание</b>: {work.Editions.FirstOrDefault()}";
                     }
@@ -120,10 +120,10 @@ namespace BooksSearchTelegramBot.res
                     {
                         message += $"<b>{author.Data.Name}</b>\n\n";
                     }
-                    if (author.Data.BirthDate != null && author.Data.DeathDate != null) 
+                    if (author.Data.BirthDate != null && author.Data.DeathDate != null)
                     {
                         message += $"<b>Годы жизни</b>: {author.Data.BirthDate} - {author.Data.DeathDate}\n\n";
-                    } 
+                    }
                     if (author.Data.Bio != null)
                     {
                         message += "<b>Биография</b>: ";
@@ -134,14 +134,14 @@ namespace BooksSearchTelegramBot.res
                         else
                         {
                             var sentences = author.Data.Bio.Split('.');
-                            var shortenedBio = string.Join(".", sentences[..^1]); 
+                            var shortenedBio = string.Join(".", sentences[..^1]);
 
                             if (shortenedBio.Length > 800)
                             {
-                                shortenedBio = shortenedBio[..800]; 
+                                shortenedBio = shortenedBio[..800];
                             }
 
-                            message += shortenedBio + ".\n\n"; 
+                            message += shortenedBio + ".\n\n";
                         }
                     }
                 }

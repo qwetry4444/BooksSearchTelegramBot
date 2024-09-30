@@ -1,9 +1,4 @@
 ﻿using BooksSearchTelegramBot.res;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BooksSearchTelegramBot.Keyboards
@@ -23,7 +18,7 @@ namespace BooksSearchTelegramBot.Keyboards
             .AddNewRow(Strings.SearchByRatingButton)
             .AddNewRow(Strings.SearchByGenreButton)
             .AddNewRow(Strings.BackButton);
-        
-            
+
+
     }
 }

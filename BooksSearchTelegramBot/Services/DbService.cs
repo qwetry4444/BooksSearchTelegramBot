@@ -3,16 +3,10 @@ using BooksSearchTelegramBot.Database.Repositories;
 
 namespace BooksSearchTelegramBot.Services
 {
-    public class DbService
+    public class DbService(UserReadedBookRepository _userReadedBookRepository, UserDeferredBookRepository _userDeferredBookRepository)
     {
-        UserReadedBookRepository userReadedBookRepository;
-        UserDeferredBookRepository userDeferredBookRepository;
-
-        public DbService(UserReadedBookRepository _userReadedBookRepository, UserDeferredBookRepository _userDeferredBookRepository) 
-        {
-            userReadedBookRepository = _userReadedBookRepository;
-            userDeferredBookRepository = _userDeferredBookRepository;
-        }
+        readonly UserReadedBookRepository userReadedBookRepository = _userReadedBookRepository;
+        readonly UserDeferredBookRepository userDeferredBookRepository = _userDeferredBookRepository;
 
         async public Task<List<UserReadedBook>> GetUserReadedBooks(long userId)
         {

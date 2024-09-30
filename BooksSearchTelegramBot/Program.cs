@@ -1,9 +1,4 @@
-﻿using BooksSearchTelegramBot;
-using BooksSearchTelegramBot.Handlers;
-using BooksSearchTelegramBot.Services;
-using Telegram.Bot;
-using Telegram.Bot.Polling;
-using Telegram.Bot.Types;
+﻿using BooksSearchTelegramBot.Services;
 
 
 namespace BooksSearchTelegramBot

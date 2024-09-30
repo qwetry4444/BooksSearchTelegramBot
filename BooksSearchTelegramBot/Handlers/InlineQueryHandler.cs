@@ -1,15 +1,14 @@
-﻿using BooksSearchTelegramBot.Services;
+﻿using BooksSearchTelegramBot.Keyboards;
+using BooksSearchTelegramBot.res;
+using BooksSearchTelegramBot.Services;
+using OpenLibraryNET;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using OpenLibraryNET;
-using BooksSearchTelegramBot.res;
-using BooksSearchTelegramBot.Keyboards;
 using Telegram.Bot.Types.Enums;
-using System.IO;
 
 namespace BooksSearchTelegramBot.Handlers
 {
-    class InlineQueryHandler(TelegramBotClient botClient, FSMContext context, OpenLibraryService openLibraryService, DbService dbService)
+    class InlineQueryHandler(TelegramBotClient botClient, OpenLibraryService openLibraryService, DbService dbService)
     {
         public async Task OnInlineQuery(Update update)
         {
@@ -24,23 +23,23 @@ namespace BooksSearchTelegramBot.Handlers
                         switch (dataParts[0])
                         {
                             case "work":
-                                await onBookSearch(query, dataParts[1]);
+                                await OnBookSearch(query, dataParts[1]);
                                 break;
 
                             case "💬 Подробнее":
-                                await onGetMoreAbourtBook(query, dataParts[1]);
+                                await OnGetMoreAbourtBook(query, dataParts[1]);
                                 break;
 
                             case "👴 Автор":
-                                await onGetBookAuthor(query, dataParts[1]);
+                                await OnGetBookAuthor(query, dataParts[1]);
                                 break;
 
                             case "✅ Прочитано":
-                                await onReadedBook(query, dataParts[1]);
+                                await OnReadedBook(query, dataParts[1]);
                                 break;
 
                             case "📚 Отложить":
-                                await onDeferredBook(query, dataParts[1]);
+                                await OnDeferredBook(query, dataParts[1]);
                                 break;
                         }
                     }
@@ -48,87 +47,118 @@ namespace BooksSearchTelegramBot.Handlers
             }
         }
 
-        public async Task onBookSearch(CallbackQuery query, string workId)
+        public async Task OnBookSearch(CallbackQuery query, string workId)
         {
-            OLWork work = await openLibraryService.SearchBookById(workId);
-            byte[]? cover = await openLibraryService.GetBookCover(work);
-
-            if (work != null)
+            try
             {
-                if (work.Data != null)
+                OLWork? work = await openLibraryService.SearchBookById(workId);
+
+                if (work != null)
                 {
-                    if (work.Data.AuthorKeys != null && work.Data.AuthorKeys.Count > 0)
+                    byte[]? cover = await openLibraryService.GetBookCover(work);
+                    if (work.Data != null)
                     {
-                        OLAuthor author = await openLibraryService.SearchAuthorById(work.Data.AuthorKeys.First());
-                        if (author != null)
+                        if (work.Data.AuthorKeys != null && work.Data.AuthorKeys.Count > 0)
                         {
-                            if (cover != null)
+                            OLAuthor? author = await openLibraryService.SearchAuthorById(work.Data.AuthorKeys.First());
+                            if (author != null)
                             {
-                                using (var stream = new MemoryStream(cover))
+                                if (cover != null)
+                                {
+                                    using var stream = new MemoryStream(cover);
                                     await botClient.SendPhotoAsync(
                                         chatId: query.From.Id,
                                         photo: stream,
                                         caption: StringsGeneration.CreateAboutBookMessage(work, author),
                                         replyMarkup: Inline.CreateBookMenuInlineMarkup(work),
                                         parseMode: ParseMode.Html);
-                            }
-                            else
-                            {
-                                await botClient.SendTextMessageAsync(
-                                        chatId: query.From.Id,
-                                        text: StringsGeneration.CreateAboutBookMessage(work, author),
-                                        replyMarkup: Inline.CreateBookMenuInlineMarkup(work),
-                                        parseMode: ParseMode.Html);
+                                }
+                                else
+                                {
+                                    await botClient.SendTextMessageAsync(
+                                            chatId: query.From.Id,
+                                            text: StringsGeneration.CreateAboutBookMessage(work, author),
+                                            replyMarkup: Inline.CreateBookMenuInlineMarkup(work),
+                                            parseMode: ParseMode.Html);
+                                }
                             }
                         }
                     }
+                    return;
                 }
 
             }
-            context.State = State.Search;
-        }
-
-        public async Task onGetMoreAbourtBook(CallbackQuery query, string workId)
-        {
-            OLWork work = await openLibraryService.SearchBookById(workId);
-            String message = StringsGeneration.CreateMoreAboutBookMessage(work);
-
+            catch (Exception) { }
             await botClient.SendTextMessageAsync(
-                    chatId: query.From.Id,
-                    text: message,
-                    replyMarkup: Reply.SearchMenuReplyMarkup,
-                    parseMode: ParseMode.Html);
+                        chatId: query.From.Id,
+                        text: Strings.CouldNotFindBook,
+                        parseMode: ParseMode.Html);
         }
 
-        public async Task onGetBookAuthor(CallbackQuery query, string athorId)
+        public async Task OnGetMoreAbourtBook(CallbackQuery query, string workId)
         {
-            OLAuthor author = await openLibraryService.SearchAuthorById(athorId);
-            byte[]? authorPhoto = await openLibraryService.GetAuthorPhoto(author);
-
-            if (author != null)
+            try
             {
-                String message = StringsGeneration.CreateAboutAuthorMessage(author);
-                if (authorPhoto != null)
+                OLWork? work = await openLibraryService.SearchBookById(workId);
+                if (work != null)
                 {
-                    using (var stream = new MemoryStream(authorPhoto))
-                        await botClient.SendPhotoAsync(
-                                        chatId: query.From.Id,
-                                        photo: stream,
-                                        caption: message,
-                                        replyMarkup: Inline.CreateAuthorMenuInlineMarkup(author),
-                                        parseMode: ParseMode.Html);
-                } else
-                {
+                    String message = StringsGeneration.CreateMoreAboutBookMessage(work);
+
                     await botClient.SendTextMessageAsync(
-                                        chatId: query.From.Id,
-                                        text: message,
-                                        replyMarkup: Inline.CreateAuthorMenuInlineMarkup(author),
-                                        parseMode: ParseMode.Html);
+                            chatId: query.From.Id,
+                            text: message,
+                            replyMarkup: Reply.SearchMenuReplyMarkup,
+                            parseMode: ParseMode.Html);
+                    return;
+                }
+
+            }
+            catch (Exception) { }
+            await botClient.SendTextMessageAsync(
+                        chatId: query.From.Id,
+                        text: Strings.CouldNotFindInformation,
+                        parseMode: ParseMode.Html);
+        }
+
+        public async Task OnGetBookAuthor(CallbackQuery query, string athorId)
+        {
+            try
+            {
+                OLAuthor? author = await openLibraryService.SearchAuthorById(athorId);
+
+                if (author != null)
+                {
+                    byte[]? authorPhoto = await openLibraryService.GetAuthorPhoto(author);
+                    String message = StringsGeneration.CreateAboutAuthorMessage(author);
+                    if (authorPhoto != null)
+                    {
+                        using (var stream = new MemoryStream(authorPhoto))
+                            await botClient.SendPhotoAsync(
+                                            chatId: query.From.Id,
+                                            photo: stream,
+                                            caption: message,
+                                            replyMarkup: Inline.CreateAuthorMenuInlineMarkup(author),
+                                            parseMode: ParseMode.Html);
+                    }
+                    else
+                    {
+                        await botClient.SendTextMessageAsync(
+                                            chatId: query.From.Id,
+                                            text: message,
+                                            replyMarkup: Inline.CreateAuthorMenuInlineMarkup(author),
+                                            parseMode: ParseMode.Html);
+                    }
+                    return;
                 }
             }
+            catch (Exception) { }
+            await botClient.SendTextMessageAsync(
+                        chatId: query.From.Id,
+                        text: Strings.CouldNotFindAuthor,
+                        parseMode: ParseMode.Html);
         }
 
-        public async Task onReadedBook(CallbackQuery query, string bookId)
+        public async Task OnReadedBook(CallbackQuery query, string bookId)
         {
             dbService.AddUserReadedBook(query.From.Id, bookId);
             await botClient.SendTextMessageAsync(
@@ -138,7 +168,7 @@ namespace BooksSearchTelegramBot.Handlers
                     parseMode: ParseMode.Html);
         }
 
-        public async Task onDeferredBook(CallbackQuery query, string bookId)
+        public async Task OnDeferredBook(CallbackQuery query, string bookId)
         {
             dbService.AddUserReadedBook(query.From.Id, bookId);
             await botClient.SendTextMessageAsync(

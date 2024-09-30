@@ -1,11 +1,5 @@
 ﻿using BooksSearchTelegramBot.res;
 using OpenLibraryNET;
-using OpenLibraryNET.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BooksSearchTelegramBot.Keyboards
@@ -41,10 +35,10 @@ namespace BooksSearchTelegramBot.Keyboards
         }
 
         public static InlineKeyboardMarkup ChoiceGenreInlineMarkup = new InlineKeyboardMarkup()
-            .AddButton("💕 Роман", "💕 Роман") 
+            .AddButton("💕 Роман", "💕 Роман")
             .AddButton("😭 Драма", "😭 Драма")
             .AddNewRow()
-            .AddButton("🌍 Путешествие", "🌍 Путешествие") 
+            .AddButton("🌍 Путешествие", "🌍 Путешествие")
             .AddButton("👽 Фэнтэзи", "👽 Фэнтэзи")
             .AddNewRow()
             .AddButton("🔎 Детектив", "🔎 Детектив")
@@ -62,7 +56,7 @@ namespace BooksSearchTelegramBot.Keyboards
                     BookHeadsInlineKeyboard.AddNewRow();
                 }
             }
-            return BookHeadsInlineKeyboard; 
+            return BookHeadsInlineKeyboard;
         }
     }
 

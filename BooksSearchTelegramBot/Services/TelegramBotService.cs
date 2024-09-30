@@ -18,12 +18,12 @@ namespace BooksSearchTelegramBot.Services
         private readonly UserDeferredBookRepository userDeferredBookRepository;
         private readonly DbService dbService;
 
-        private readonly FSMContext fSMContext;
+        private readonly Dictionary<long, FSMContext> fSMContexts;
         private readonly TextMessageHandler textMessageHandler;
-        private readonly InlineQueryHandler inlineQueryHandler; 
+        private readonly InlineQueryHandler inlineQueryHandler;
 
         public TelegramBotService(string token)
-        { 
+        {
             cts = new CancellationTokenSource();
             bot = new TelegramBotClient(token, cancellationToken: cts.Token);
 
@@ -34,9 +34,9 @@ namespace BooksSearchTelegramBot.Services
             userDeferredBookRepository = new UserDeferredBookRepository(applicationDbContext);
             dbService = new DbService(userReadedBookRepository, userDeferredBookRepository);
 
-            fSMContext = new FSMContext();
-            textMessageHandler = new TextMessageHandler(bot, fSMContext, openLibraryService, dbService);
-            inlineQueryHandler = new InlineQueryHandler(bot, fSMContext, openLibraryService, dbService);   
+            fSMContexts = [];
+            textMessageHandler = new TextMessageHandler(bot, fSMContexts, openLibraryService, dbService);
+            inlineQueryHandler = new InlineQueryHandler(bot, openLibraryService, dbService);
         }
 
         public async Task StartBotAsync()
@@ -61,7 +61,7 @@ namespace BooksSearchTelegramBot.Services
 
         async Task OnError(Exception exception, HandleErrorSource source)
         {
-            Console.WriteLine(exception); 
+            Console.WriteLine(exception);
         }
     }
 }

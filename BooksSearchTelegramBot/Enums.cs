@@ -25,5 +25,5 @@
         MoreAboutAuthor,
         BoooksOfAuthor,
     }
-    
+
 }
