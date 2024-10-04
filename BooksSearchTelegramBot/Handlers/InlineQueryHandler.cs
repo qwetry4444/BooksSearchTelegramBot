@@ -170,7 +170,7 @@ namespace BooksSearchTelegramBot.Handlers
 
         public async Task OnDeferredBook(CallbackQuery query, string bookId)
         {
-            dbService.AddUserReadedBook(query.From.Id, bookId);
+            dbService.AddUserDeferredBook(query.From.Id, bookId);
             await botClient.SendTextMessageAsync(
                     chatId: query.From.Id,
                     text: Strings.AddToDefferedMessage,
